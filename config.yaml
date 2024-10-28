@@ -1,0 +1,18 @@
+# config.yaml
+
+paths:
+  root_dir: './'                           # Root directory for the project
+  data_dir: './data/'                      # Directory for data files
+  images_dir: './data/images/'             # Directory for image files
+  input_file: 'serial_numbers_test.xlsx'   # Input Excel file name
+  output_file_prefix: 'updated_serial_numbers'  # Prefix for output file
+
+gui:
+  window_width: null                       # Window width, set null for automatic sizing
+  window_height: null                      # Window height, set null for automatic sizing
+  padx: 10                                 # Padding for widgets in x direction
+  pady: 10                                 # Padding for widgets in y direction
+
+cropping:
+  horizontal_padding: 30                   # Horizontal padding for image cropping
+  vertical_padding: 40                     # Vertical padding for image cropping
