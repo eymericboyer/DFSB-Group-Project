@@ -21,7 +21,7 @@ def main():
     corrected_df['serial_number'] = corrected_df['serial_number'].astype(str)
 
     # Initialize the UI
-    initialize_ui(corrected_df, images_dir, output_file_path)
+    initialize_ui(corrected_df, df, images_dir, output_file_path, input_file_path)
 
 
 if __name__ == "__main__":

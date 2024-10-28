@@ -7,7 +7,7 @@ from utils.file_handling import save_data
 import numpy as np
 
 
-def initialize_ui(corrected_df, images_dir, output_file_path):
+def initialize_ui(corrected_df, df, images_dir, output_file_path, input_file_path):
     def update_image_display():
         nonlocal image_tk, character_tk, current_index
 
@@ -156,7 +156,7 @@ def initialize_ui(corrected_df, images_dir, output_file_path):
         if current_index < len(corrected_df):
             update_image_display()
         else:
-            save_data(corrected_df, output_file_path)
+            save_data(corrected_df, df, output_file_path, input_file_path)
             root.quit()
             root.destroy()
 
@@ -169,7 +169,7 @@ def initialize_ui(corrected_df, images_dir, output_file_path):
         next_image()
 
     def on_quit():
-        save_data(corrected_df, output_file_path)
+        save_data(corrected_df, df, output_file_path, input_file_path)
         root.destroy()
 
     root = Tk()
