@@ -97,15 +97,17 @@ def initialize_ui(corrected_df, df, images_dir, output_file_path, input_file_pat
             # Determine coordinates based on which image is being displayed
             if all_inside:
                 text_size = cv2.getTextSize(char, cv2.FONT_HERSHEY_SIMPLEX, font_scale, 3)[0]
+
                 # Adjust coordinates for the cropped image
-                adjusted_x = int(x) - x_min - text_size[0] // 2
-                adjusted_y = int(y) - y_min + text_size[1] // 2
+                adjusted_x = int(x) - x_min - text_size[0]
+                adjusted_y = int(y) - y_min + text_size[1]
                 cv2.putText(character_image, char, (adjusted_x, adjusted_y), cv2.FONT_HERSHEY_SIMPLEX, 2 * font_scale,
                             (0, 0, 255), 2)
 
             else:
                 # Use original coordinates for the big image
                 text_size = cv2.getTextSize(char, cv2.FONT_HERSHEY_SIMPLEX, font_scale, 3)[0]
+                print(text_size)
                 adjusted_x = int(x) - text_size[0] // 2
                 adjusted_y = int(y) + text_size[1] // 2
                 cv2.putText(character_image, char, (adjusted_x, adjusted_y), cv2.FONT_HERSHEY_SIMPLEX, font_scale,
