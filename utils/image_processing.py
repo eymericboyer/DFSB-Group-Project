@@ -27,4 +27,4 @@ def calculate_window(row, h_pad, v_pad, image_shape):
     y_min = int(rotated_c1[1] - v_pad)
     y_max = int(rotated_c1[1] + v_pad)
 
-    return rotated_c1, rotated_c11, x_min, x_max, y_min, y_max, angle
+    return x_min, x_max, y_min, y_max, angle
