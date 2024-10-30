@@ -4,7 +4,7 @@ paths:
   root_dir: './'                           # Root directory for the project
   data_dir: './data/'                      # Directory for data files
   images_dir: './data/images/'             # Directory for image files
-  input_file: 'serial_numbers_test.xlsx'   # Input Excel file name
+  input_file: 'serial_numbers.xlsx'   # Input Excel file name
   output_file_prefix: 'updated_serial_numbers'  # Prefix for output file
 
 gui:
