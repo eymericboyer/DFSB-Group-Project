@@ -12,8 +12,22 @@ from utils.ui_helpers import get_rotate_parameters, get_rotated_positions_and_ch
 
 
 def initialize_ui(corrected_df, df, images_dir, output_file_path, input_file_path):
+    """
+    Initializes the graphical user interface for image review and editing.
+
+    Args:
+        corrected_df (pd.DataFrame): DataFrame containing corrected data entries.
+        df (pd.DataFrame): Original DataFrame.
+        images_dir (str): Directory containing the images.
+        output_file_path (str): Path for saving the output file.
+        input_file_path (str): Path to the input file.
+    """
+
     def go_to_index():
-        # Try to navigate to the entered index
+        """
+        Navigates to the image at the index specified in the index entry box.
+        Handles input validation and ensures the index is within range.
+        """
         try:
             new_index = int(index_entry.get()) - 1
             if 0 <= new_index < len(corrected_df):
@@ -26,9 +40,15 @@ def initialize_ui(corrected_df, df, images_dir, output_file_path, input_file_pat
             print("Invalid index entered")
 
     def update_image_display(index):
+        """
+        Updates the image display and associated information based on the specified index.
+
+        Args:
+            index (int): Index of the image to display.
+        """
         row = corrected_df.iloc[index]
         index_entry.delete(0, "end")
-        index_entry.insert(0, str(index+1))
+        index_entry.insert(0, str(index + 1))
 
         image_path = os.path.join(images_dir, str(row['image']))
         image = cv2.imread(image_path)
@@ -46,7 +66,8 @@ def initialize_ui(corrected_df, df, images_dir, output_file_path, input_file_pat
         rotated_positions, all_inside = get_rotated_positions_and_check_all_inside(row, center, angle, x_min, y_min,
                                                                                    x_max, y_max)
 
-        character_image, cropped_image, target_height, target_width, font_scale = get_images(rotated_image, all_inside, x_min, y_min, x_max, y_max)
+        character_image, cropped_image, target_height, target_width, font_scale = get_images(rotated_image, all_inside,
+                                                                                             x_min, y_min, x_max, y_max)
 
         # Overlay the characters on the character image
         overlay_characters(character_image, rotated_positions, row, all_inside, font_scale, x_min, y_min)
@@ -55,21 +76,30 @@ def initialize_ui(corrected_df, df, images_dir, output_file_path, input_file_pat
                                                     cropped_image.shape[1] * 2)
         tk_character_image = convert_image_to_tkinter(character_image, target_height, target_width)
 
-        update_labels(row, unsure_text_var, character_image_label, tk_character_image, cropped_image_label, tk_cropped_image, serial_var, file_name_var, progress_var, unsure_var, current_index, corrected_df)
+        update_labels(row, unsure_text_var, character_image_label, tk_character_image, cropped_image_label,
+                      tk_cropped_image, serial_var, file_name_var, progress_var, unsure_var, current_index,
+                      corrected_df)
 
         resize_window(tk_cropped_image, tk_character_image, root)
 
         return
 
     def resize_window(image_pil, character_image_pil, root):
-        # Resize the window if necessary
+        """
+        Resizes the application window based on the current image dimensions.
+
+        Args:
+            image_pil (ImageTk.PhotoImage): PIL image of the cropped image.
+            character_image_pil (ImageTk.PhotoImage): PIL image of the character overlay.
+            root (Tk): Root Tkinter window.
+        """
         total_height = image_pil.height() + character_image_pil.height() + 125
         total_width = int(character_image_pil.width() * 1.35)
         root.geometry(f"{total_width}x{total_height}")  # Add some extra height for buttons
         center_window()  # Center the window after updating the display
 
     def center_window():
-        """Center the window on the screen."""
+        """Centers the main application window on the screen."""
         root.update_idletasks()  # Ensures all widget sizes are computed
         window_width = root.winfo_width()
         window_height = root.winfo_height()
@@ -80,13 +110,16 @@ def initialize_ui(corrected_df, df, images_dir, output_file_path, input_file_pat
         root.geometry(f"{window_width}x{window_height}+{x_cordinate}+{y_cordinate}")
 
     def on_serial_change(*args):
-        """Enable the edit button only if the serial number length is exactly 11 characters."""
+        """Enables or disables the sure/unsure buttons based on serial number length."""
         sure_button.config(state="normal" if len(serial_var.get()) == 11 else "disabled")
         unsure_button.config(state="normal" if len(serial_var.get()) == 11 else "disabled")
 
     def next_image():
+        """
+        Advances to the next image, saving any edits made to the serial number field.
+        Ends the program if the last image is reached.
+        """
         nonlocal current_index
-        # Save the edited serial number if it's valid
         corrected_df.at[current_index, 'serial_number'] = serial_var.get()
         current_index += 1
         if current_index < len(corrected_df):
@@ -97,10 +130,12 @@ def initialize_ui(corrected_df, df, images_dir, output_file_path, input_file_pat
             root.destroy()
 
     def on_sure():
+        """Marks the current image as 'Sure' and moves to the next image."""
         corrected_df.at[current_index, 'unsure'] = float(0)
         next_image()
 
     def on_unsure():
+        """Toggles the unsure status for the current image and updates UI accordingly."""
         if unsure_var.get() == "Unsure":
             unsure_var.set("Still Unsure")
             draw_filtered_images(cropped_image_label, character_image_label)
@@ -109,10 +144,12 @@ def initialize_ui(corrected_df, df, images_dir, output_file_path, input_file_pat
             next_image()
 
     def on_quit():
+        """Saves the current data and exits the application."""
         save_data(df, corrected_df, output_file_path, input_file_path)
         root.destroy()
 
     def update_colour(*args):
+        """Changes the color of the unsure label based on its text content."""
         text = unsure_text_var.get()
         if text.lower() == "the accuracy of this image has been labeled as unsure.":
             unsure_label.config(fg="red")
@@ -172,7 +209,7 @@ def initialize_ui(corrected_df, df, images_dir, output_file_path, input_file_pat
     total_label.pack(side="left")
 
     # Button to navigate to the specified index
-    go_button = Button(navigation_frame, text="→", command=go_to_index)
+    go_button = Button(navigation_frame, text="Go", command=go_to_index)
     go_button.pack(side="left")
 
     # Entry for serial number editing
@@ -186,7 +223,8 @@ def initialize_ui(corrected_df, df, images_dir, output_file_path, input_file_pat
     sure_unsure_frame.grid(row=30, column=10, padx=10, pady=10)
     sure_button = Button(sure_unsure_frame, text="Sure", command=on_sure, state="disabled")  # Initially disabled
     sure_button.grid(row=30, column=10, padx=10, pady=10)  # Edit button in the right column
-    unsure_button = Button(sure_unsure_frame, textvariable=unsure_var, command=on_unsure, state="disabled")  # Initially disabled
+    unsure_button = Button(sure_unsure_frame, textvariable=unsure_var, command=on_unsure,
+                           state="disabled")  # Initially disabled
     unsure_button.grid(row=30, column=11, padx=10, pady=10)  # Edit button in the right column
     quit_button = Button(buttons_frame, text="Save and Exit", command=on_quit)
     quit_button.grid(row=40, column=10, padx=10, pady=10)  # Quit button in the right column

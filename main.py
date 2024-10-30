@@ -15,6 +15,21 @@ output_file_path = os.path.join(data_dir, config['paths']['output_file_prefix'])
 
 
 def main():
+    """
+    Main function to load data, set up paths, and initialize the Tkinter UI.
+
+    This function performs the following steps:
+    - Loads an Excel file specified in the configuration as a DataFrame.
+    - Creates a copy of the DataFrame to track any corrections made in the UI.
+    - Converts the `serial_number` column to string format to ensure consistency.
+    - Launches the UI for reviewing and editing data.
+
+    Args:
+        None
+
+    Returns:
+        None
+    """
     # Load the input Excel file
     df = pd.read_excel(input_file_path)
     corrected_df = df.copy()
