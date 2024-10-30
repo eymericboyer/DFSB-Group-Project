@@ -108,6 +108,8 @@ def update_labels(row, unsure_text_var, character_image_label, tk_character_imag
     except KeyError:
         print(f"The file had no 'unsure' column.")
         unsure_text_var.set("The accuracy of this image has not been labeled yet.")
+    except ValueError:
+        unsure_text_var.set("The accuracy of this image has not been labeled yet.")
 
     # Update the character_image_label with the character image
     character_image_label.config(image=tk_character_image)

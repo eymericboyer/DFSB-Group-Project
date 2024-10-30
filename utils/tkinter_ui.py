@@ -12,10 +12,24 @@ from utils.ui_helpers import get_rotate_parameters, get_rotated_positions_and_ch
 
 
 def initialize_ui(corrected_df, df, images_dir, output_file_path, input_file_path):
-    def update_image_display():
-        nonlocal current_index
+    def go_to_index():
+        # Try to navigate to the entered index
+        try:
+            new_index = int(index_entry.get()) - 1
+            if 0 <= new_index < len(corrected_df):
+                nonlocal current_index
+                current_index = new_index
+                update_image_display(current_index)
+            else:
+                print("Index out of range")
+        except ValueError:
+            print("Invalid index entered")
 
-        row = corrected_df.iloc[current_index]
+    def update_image_display(index):
+        row = corrected_df.iloc[index]
+        index_entry.delete(0, "end")
+        index_entry.insert(0, str(index+1))
+
         image_path = os.path.join(images_dir, str(row['image']))
         image = cv2.imread(image_path)
         if image is None:
@@ -76,7 +90,7 @@ def initialize_ui(corrected_df, df, images_dir, output_file_path, input_file_pat
         corrected_df.at[current_index, 'serial_number'] = serial_var.get()
         current_index += 1
         if current_index < len(corrected_df):
-            update_image_display()
+            update_image_display(current_index)
         else:
             save_data(corrected_df, df, output_file_path, input_file_path)
             root.quit()
@@ -144,11 +158,22 @@ def initialize_ui(corrected_df, df, images_dir, output_file_path, input_file_pat
     buttons_frame = Frame(image_and_buttons_frame)
     buttons_frame.grid(row=10, column=20, padx=10, pady=10)
 
-    # Text showing progress and file number
-    file_name = Label(buttons_frame, textvariable=file_name_var)
-    file_name.grid(row=5, column=10, padx=10, pady=10)
-    progress = Label(buttons_frame, textvariable=progress_var)
-    progress.grid(row=6, column=10, padx=10, pady=10)
+    # Frame for index and navigation
+    navigation_frame = Frame(buttons_frame)
+    navigation_frame.grid(row=5, column=10, padx=10, pady=10)
+
+    # Editable index entry
+    index_entry = Entry(navigation_frame, width=5, justify='center')
+    index_entry.insert(0, str(current_index + 1))
+    index_entry.pack(side="left")
+
+    # Label showing the total number of files
+    total_label = Label(navigation_frame, text=f"/{len(corrected_df)}")
+    total_label.pack(side="left")
+
+    # Button to navigate to the specified index
+    go_button = Button(navigation_frame, text="→", command=go_to_index)
+    go_button.pack(side="left")
 
     # Entry for serial number editing
     serial_entry = Entry(buttons_frame, textvariable=serial_var)
@@ -170,7 +195,7 @@ def initialize_ui(corrected_df, df, images_dir, output_file_path, input_file_pat
     serial_var.trace_add("write", on_serial_change)
 
     # Initialize display with the first image and serial number
-    update_image_display()
+    update_image_display(current_index)
     center_window()  # Center the window after initializing
 
     root.mainloop()
